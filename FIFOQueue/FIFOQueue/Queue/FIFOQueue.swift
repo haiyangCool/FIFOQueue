@@ -55,6 +55,20 @@ extension FIFOQueue: Collection {
             return right[position - left.count]
         }
     }
+    
+    /// Indices 集合的indices属性类型，是集合中所有有效索引按升序排列组成的集合。
+    /// 但是不包含endIndex,因为 endIndex代表的是集合中最后一个元素之后的位置，
+    /// 并不是一个有效的索引。Indices 需要报纸对原有集合的引用，才能对索引进行
+    /// 步进。这里就会有一个问题，如果用户在迭代的同时改变集合的内容，可能会
+    /// 造成性能问题（如果集合是以写时复制来实现的话，这个对集合的额外引用将会
+    /// 触发不必要的复制），因此如果可以为自定义的集合类型提供一个不需要引用
+    /// 原始序列的indices类型，这是一个很值得尝试的优化。实际上只要索引位置的计算
+    /// 不依赖于集合本身，例如标准库中的数组等，就是如此，因为FIFOQueue的索引
+    /// 是整数类型，可以直接使用 Range<Int>。
+    typealias Indices = Range<Int>
+    var indices: Range<Int> {
+        return startIndex..<endIndex
+    }
 }
 
 /// 实现数组字面量表达式
