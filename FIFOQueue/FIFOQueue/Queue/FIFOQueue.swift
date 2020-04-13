@@ -34,7 +34,7 @@ struct FIFOQueue<Element> {
 /// 1、startIndex 和 endIndex 属性
 /// 2、提供一个至少可以只读方式访问集合元素的下标
 /// 3、一个用来在你的集合中进行步进的方法index(after:)
-extension FIFOQueue: Collection {
+extension FIFOQueue: Collection, MutableCollection {
     
     /// 默认第一个元素的其实位置 为0
     public var startIndex: Int { return 0 }
@@ -46,15 +46,28 @@ extension FIFOQueue: Collection {
         return i + 1
     }
 
+    /// 修改 subscript 以满足 MutableCollection通过下标修改元素的能力
     public subscript(position: Int) -> Element {
-        precondition((startIndex..<endIndex).contains(position),
-            "Index out of bounds")
-        if position < left.endIndex {
-            return left[left.count - position - 1]
-        } else {
-            return right[position - left.count]
-        }
-    }
+        get {
+            precondition((0..<endIndex).contains(position), "Index out of bounds")
+            if position < left.endIndex {
+                return left[left.count - position - 1]
+            } else {
+                return right[position - left.count]
+            }
+
+         }
+        
+        /// 满足 MutableCollection通过下标修改元素的能力
+        set {
+            precondition((0..<endIndex).contains(position), "Index out of bounds")
+            if position < left.endIndex {
+                left[left.count - position - 1] = newValue
+            } else {
+                return right[position - left.count] = newValue
+            }
+         }
+     }
     
     /// Indices 集合的indices属性类型，是集合中所有有效索引按升序排列组成的集合。
     /// 但是不包含endIndex,因为 endIndex代表的是集合中最后一个元素之后的位置，
