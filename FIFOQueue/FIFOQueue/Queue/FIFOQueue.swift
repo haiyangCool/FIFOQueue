@@ -84,6 +84,19 @@ extension FIFOQueue: Collection, MutableCollection {
     }
 }
 
+/// 实现RangeReplaceableCollection ，提供替换指定范围内的元素的能力
+extension FIFOQueue: RangeReplaceableCollection {
+    mutating func replaceSubrange<C: Collection>(
+        _ subrange: Range<Int>,
+        with newElements: C) where C.Element == Element
+    {
+        right = left.reversed() + right
+        left.removeAll()
+        right.replaceSubrange(subrange, with: newElements)
+    }
+}
+
+
 /// 实现数组字面量表达式
 extension FIFOQueue: ExpressibleByArrayLiteral {
 
@@ -93,4 +106,5 @@ extension FIFOQueue: ExpressibleByArrayLiteral {
         self.init(left: elements.reversed(), right: [])
     }
 }
+
 
